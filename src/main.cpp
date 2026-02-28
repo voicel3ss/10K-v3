@@ -171,13 +171,13 @@ void opcontrol() {
     // Score
 // Lever toggle
   if (master.get_digital_new_press(DIGITAL_R2)) {
-    lever_up = !lever_up;
-
-    if (lever_up)
-      robot.moveLeverTo(110, +1, 127);  
-      pros::delay(1000);  // 
-      robot.moveLeverTo(0, -1, 127);    
-  }
+    int start_time = pros::millis(); 
+      robot.moveLeverTo(105, +1, 127);  
+      
+      pros::delay(400);  
+      robot.moveLeverTo(0, -1, 60);    
+    
+    robot.moveLeverTo(0, -1, 60);  // Ensure lever returns to starting position after timeout
     // Matchloader
     if (master.get_digital_new_press(DIGITAL_DOWN))
       robot.toggleMatchloader();
@@ -190,4 +190,5 @@ void opcontrol() {
 
     pros::delay(ez::util::DELAY_TIME);
   }
+}
 }
