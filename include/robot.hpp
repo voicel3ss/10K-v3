@@ -42,6 +42,8 @@ class Robot {
   void scoreMid();
   double getLeverRotation();
   double decidePoseLever();
+
+  bool isIntakeRunning() const;
  private:
   // Hardware
   pros::Motor first_stage;
@@ -64,18 +66,18 @@ class Robot {
 
   // ===== Lever constants (easy tuning) =====
   // Speeds
-  const int lever_full_speed = 110;  // max
-  const int lever_slow_speed = 40;   // TODO tune this max for now 
+  const int lever_full_speed = 127;  // max
+  const int lever_slow_speed = 70;   // TODO tune this max for now 
   
 
   // Positions (degrees)
-  const double lever_score_pose_high = 100.0;
-  const double lever_score_pose_mid = 20.0;//4 bar changes angle to stop
+  const double lever_score_pose_high = 600.0;
+  const double lever_score_pose_mid = 700.0;//4 bar changes angle to stop
   const double lever_home_position = 0.0;
   
 
   // Timing
-  const uint32_t score_time_ms = 800;
+  const uint32_t score_time_ms = 2000;
   const uint32_t move_home_time_ms = 800; // time to reset cuz start time too old 
   const uint32_t blocker_open_delay_ms = 100; //
   const uint32_t lever_hold_ms = 300; //time waiting at top 
@@ -89,7 +91,7 @@ class Robot {
   const bool blocker_closed_value = false;
 
   // Lever settling window
-  const double lever_settle_window_deg = 20.0;
+  const double lever_settle_window_deg = 10.0;
   bool startLoop = true;
 
   // Active speed cap chosen at the moment score() is requested

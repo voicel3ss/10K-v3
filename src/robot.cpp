@@ -72,6 +72,7 @@ void Robot::init() {
   enforceWingRule();
 
   lever.set_brake_mode(MOTOR_BRAKE_BRAKE);
+  lever.set_zero_position(0);
   intake_running = false;
   
 }
@@ -165,6 +166,8 @@ void Robot::toggleWing() {
     wingUp();
 }
 
+bool Robot::isIntakeRunning() const { return intake_running; }
+
 // -------- Lever score sequence (async) --------
 
 void Robot::score() {
@@ -187,7 +190,10 @@ void Robot::score_task() {
       score_requested = false;
 
       blocker.set_value(blocker_open_value);
+      
+      state_start_ms = pros::millis();
       score_state = ScoreState::OPEN_BLOCKER_DELAY;
+      pros::delay(10);
     }
 
     switch (score_state) {
@@ -197,26 +203,21 @@ void Robot::score_task() {
 
       case ScoreState::OPEN_BLOCKER_DELAY:
         if (pros::millis() - state_start_ms >= blocker_open_delay_ms) { 
-          // start moving toward score using rotation sensor
-          score_state = ScoreState::MOVE_TO_SCORE;
+          lever.move_absolute(
+              decidePoseLever(),
+              active_lever_speed);
+          
           state_start_ms = pros::millis();
+          score_state = ScoreState::MOVE_TO_SCORE;
         }
         break;
 
-      case ScoreState::MOVE_TO_SCORE: {
-        okapi::Timer timer;
-        double pos = rot_deg(lever_rotation);
-        double err = decidePoseLever() - pos;
-        lever.move( active_lever_speed);//just forward direction
-        if (std::abs(err) <= lever_settle_window_deg || pros::millis() - state_start_ms > score_time_ms) { 
-          lever.move(0);
+      case ScoreState::MOVE_TO_SCORE: 
+        if (std::abs(lever.get_position() - decidePoseLever()) < lever_settle_window_deg || pros::millis() - state_start_ms > score_time_ms) {
           state_start_ms = pros::millis();
           score_state = ScoreState::HOLD_SCORE;
         }
         break;
-        
-
-      }
 
       case ScoreState::HOLD_SCORE:
         lever.move(0);
@@ -227,17 +228,15 @@ void Robot::score_task() {
         break;
 
       case ScoreState::MOVE_TO_HOME: {
-        double pos = rot_deg(lever_rotation);
-        double err = lever_home_position - pos;
-        lever.move(-1 * active_lever_speed);
-
-        if (std::abs(err) < lever_settle_window_deg || pros::millis() - move_home_start > move_home_time_ms) {  
+        lever.move_absolute(lever_home_position, active_lever_speed);
+        if (pros::millis() - move_home_start > move_home_time_ms) {  
           lever.move(0);
           blocker.set_value(blocker_closed_value);
           score_state = ScoreState::IDLE;
         }
         break;
       }
+
       case ScoreState::MOVE_HOME_START:
         double pos = rot_deg(lever_rotation);
         double err = lever_home_position - pos;
