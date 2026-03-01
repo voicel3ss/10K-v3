@@ -1,7 +1,5 @@
 #include "main.h"
 
-#include "robot.hpp"
-
 ez::Drive chassis(
     {-6, 8, -5},  // Left motors
     {9, -10, 7},  // Right motors (negative for reversed)
@@ -14,40 +12,83 @@ ez::tracking_wheel horiz_tracker(
     2,     // Wheel Diameter
     4.0);  // Distance to center of robot
 
-Robot robot(
-    2,    // firstStagePort
-    20,   // leverPort
-    15,   // rotationPort
-    'D',  // blockerPort
-    'G',  // liftPort
-    'H',  // matchloaderPort
-    'C'   // wingPort
-);
+pros::Motor intake(2);
+pros::Motor lever(20);
+pros::Rotation lever_rotation(15);
 
-static constexpr int R1L1_TOLERANCE_MS = 250;
+ez::Piston blocker('D');
+ez::Piston lift('G');
+ez::Piston matchloader('H');
+ez::Piston wing('C');
 
 bool drive_arcade = false;
-bool was_outtaking = false;
-bool intake_was_on_before_outtake = false;
+bool intake_toggle = false;
+bool reverse_toggle = false;
+bool lift_toggle = false;
+bool wing_toggle = false;
 
-uint32_t last_r1_press_ms = 0;
-uint32_t last_l1_press_ms = 0;
-bool r1l1_combo_latched = false;
+void score(){
+  if (!lift_toggle){
+    intake.move(127);
+    lever.move_absolute(650, 600);
+    blocker.set(true);
+    pros::delay(800);
+    intake.move(0);
+    lever.move_absolute(0, 600);
+    pros::delay(400);
+  } else {
+    intake.move(127);
+    lever.move_absolute(750, 100);
+    blocker.set(true);
+    pros::delay(800);
+    intake.move(0);
+    lever.move_absolute(0, 600);
+    pros::delay(400);
+  }
+}
 
-void drive_mode_task() {
+void controls() {
   while (true) {
+    bool r1_new = master.get_digital_new_press(DIGITAL_R1);
+    bool l1_new = master.get_digital_new_press(DIGITAL_L1);
+    bool r1 = master.get_digital(DIGITAL_R1);
+    bool l1 = master.get_digital(DIGITAL_L1);
+
+    if ((r1_new && l1) || (l1_new && r1)) {
+      lift_toggle = !lift_toggle;
+      blocker.set(false);
+      pros::delay(250);
+    } else if (l1_new) {
+      intake_toggle = !intake_toggle;
+      blocker.set(false);
+    } else if (r1) {
+      wing_toggle = true;
+    } else if (!r1) {
+      wing_toggle = false;
+    }
+
     if (master.get_digital_new_press(DIGITAL_UP)) {
       drive_arcade = !drive_arcade;
       master.set_text(0, 0, drive_arcade ? "Drive: Arcade" : "Drive: Tank");
       master.rumble(drive_arcade ? "." : "..");
+    }
+
+    if (master.get_digital(DIGITAL_L2)) {
+      intake_toggle = false;
+      reverse_toggle = true;
+    } else {
+      reverse_toggle = false;
+    }
+
+    if (master.get_digital_new_press(DIGITAL_R2)) {
+      pros::Task score_task(score);
     }
     pros::delay(ez::util::DELAY_TIME);
   }
 }
 
 void initialize() {
-  // ez::ez_template_print();
-
+  ez::ez_template_print();
   pros::delay(500);
   default_constants();
   // Look at your horizontal tracking wheel and decide if it's in front of the midline of your robot or behind it
@@ -67,12 +108,31 @@ void initialize() {
   chassis.initialize();
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+  chassis.pid_targets_reset();
+  chassis.drive_imu_reset();
+  chassis.drive_sensor_reset();
+  chassis.odom_xyt_set(0_in, 0_in, 0_deg);
 
-  robot.init();
+  lever_rotation.reset_position();
 
   master.set_text(0, 0, drive_arcade ? "Drive: Arcade" : "Drive: Tank");
-  pros::Task driveModeTask(drive_mode_task);
+  pros::Task controlTask(controls);
   // ez::as::initialize();
+  pros::lcd::initialize();
+
+  pros::Task screen_task([&]() {
+    while (true) {
+      pros::lcd::print(0, "x: %f", chassis.odom_x_get());
+      pros::lcd::print(1, "y: %f", chassis.odom_y_get());
+      pros::lcd::print(2, "theta: %f", chassis.odom_theta_get());
+
+      pros::lcd::print(4, "lever: %d", lever_rotation.get_position());
+      pros::lcd::print(5, "lever velocity: %d", lever_rotation.get_velocity());
+      pros::delay(20);
+    }
+  });
+
+  lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 void disabled() {
@@ -101,13 +161,6 @@ void screen_print_tracker(ez::tracking_wheel* tracker, std::string name, int lin
   ez::screen_print(tracker_value + tracker_width, line);  // Print final tracker text
 }
 
-void print_task() {
-  while (true) {
-    pros::lcd::set_text(0, "Lever Rotation: " + util::to_string_with_precision(robot.getLeverRotation()));
-    pros::delay(10);
-  }
-}
-
 void ez_screen_task() {
   while (true) {
     if (!pros::competition::is_connected()) {
@@ -117,7 +170,6 @@ void ez_screen_task() {
                                "\ny: " + util::to_string_with_precision(chassis.odom_y_get()) +
                                "\na: " + util::to_string_with_precision(chassis.odom_theta_get()),
                            1);  // Don't override the top Page line
-          ez::screen_print("rotation: " + util::to_string_with_precision(robot.getLeverRotation()), 2);
           screen_print_tracker(chassis.odom_tracker_left, "l", 4);
           screen_print_tracker(chassis.odom_tracker_right, "r", 5);
           screen_print_tracker(chassis.odom_tracker_back, "b", 6);
@@ -134,8 +186,7 @@ void ez_screen_task() {
     pros::delay(ez::util::DELAY_TIME);
   }
 }
-// pros::Task ezScreenTask(ez_screen_task);
-pros::Task printTask(print_task);
+
 void ez_template_extras() {
   if (!pros::competition::is_connected()) {
     //  * use A and Y to increment / decrement the constants
@@ -171,80 +222,19 @@ void opcontrol() {
     else
       chassis.opcontrol_tank();
 
-    uint32_t now = pros::millis();
-
-    // record press times
-    if (master.get_digital_new_press(DIGITAL_R1)) last_r1_press_ms = now;
-    if (master.get_digital_new_press(DIGITAL_L1)) last_l1_press_ms = now;
-
-    // combo if pressed within tolerance, and still "recent"
-    uint32_t newest = (last_r1_press_ms > last_l1_press_ms) ? last_r1_press_ms : last_l1_press_ms;
-    uint32_t diff = (last_r1_press_ms > last_l1_press_ms) ? (last_r1_press_ms - last_l1_press_ms)
-                                                          : (last_l1_press_ms - last_r1_press_ms);
-
-    bool r1Held = master.get_digital(DIGITAL_R1);
-    bool l1Held = master.get_digital(DIGITAL_L1);
-
-    bool combo_now = r1Held && l1Held && (diff <= (uint32_t)R1L1_TOLERANCE_MS) &&
-                     ((now - newest) <= (uint32_t)R1L1_TOLERANCE_MS);
-
-    // Fire combo once (NO DELAY)
-    if (combo_now && !r1l1_combo_latched) {
-      robot.toggleLift();
-      r1l1_combo_latched = true;
+    if (reverse_toggle) {
+      intake.move(-127);
     }
 
-    // L1 alone toggles intake, but NOT during combo and NOT during L2 outtake override
-    if (master.get_digital_new_press(DIGITAL_L1) && !combo_now && !master.get_digital(DIGITAL_L2)) {
-      robot.toggleIntake();
+    if (intake_toggle && !reverse_toggle) {
+      intake.move(127);
+    } else if (!reverse_toggle) {
+      intake.move(0);
     }
 
-    // reset latch when both released
-    if (!r1Held && !l1Held) {
-      r1l1_combo_latched = false;
-    }
-    // L1 alone toggles intake (only if not combo)
-
-    // Reverse intake
-    // Reverse intake (temporary override)
-    if (master.get_digital_new_press(DIGITAL_L2)) {
-      intake_was_on_before_outtake = robot.isIntakeRunning();  // or add getter
-      robot.reverseIntake();
-      was_outtaking = true;
-    }
-
-    if (master.get_digital(DIGITAL_L2)) {
-      // keep reversing while held
-      robot.reverseIntake();
-      was_outtaking = true;
-    } else if (was_outtaking) {
-      // restore what intake was doing before L2
-      if (intake_was_on_before_outtake)
-        robot.intakeOn();
-      else
-        robot.intakeOff();
-      was_outtaking = false;
-    }
-
-    // Score
-    if (master.get_digital_new_press(DIGITAL_R2))
-      robot.score();
-
-    // Matchloader
-    if (master.get_digital_new_press(DIGITAL_DOWN))
-      robot.toggleMatchloader();
-
-    // Wing hold
-    if (!combo_now && !r1l1_combo_latched) {
-      if (master.get_digital(DIGITAL_R1))
-        robot.wingUp();
-      else
-        robot.wingDown();
-    } else {
-      // optional: force wing down during combo
-      robot.wingDown();
-    }
-
+    matchloader.button_toggle(DIGITAL_DOWN);
+    lift.set(lift_toggle);
+    wing.set(wing_toggle);
     pros::delay(ez::util::DELAY_TIME);
   }
 }
