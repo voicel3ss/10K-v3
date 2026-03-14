@@ -172,10 +172,11 @@ void initialize() {
   //  - ignore this if you aren't using a horizontal tracker
 
   ez::as::auton_selector.autons_add({
-    {"SAWP", sawp},
+    {"Nine Ball Right Wing", nine_ball_right_wing},
     {"Six Ball Right Wing", six_ball_right_wing},
-      {"Nine Ball Right Wing", nine_ball_right_wing},
-      {"Six Ball Right Score", six_ball_right_score},
+    {"Six Ball Right Score", six_ball_right_score},
+    {"SAWP", sawp},
+    {"Skills", skills},
   });
 
   chassis.odom_tracker_back_set(&horiz_tracker);

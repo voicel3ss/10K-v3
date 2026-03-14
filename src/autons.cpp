@@ -102,17 +102,17 @@ void six_ball_starter(){
   pros::delay(300);
   matchloader.set(true);
   pros::delay(400);
-  chassis.pid_drive_set(-18_in, 90);
-  pros::delay(600);
+  chassis.pid_drive_set(-20_in, 90);
+  pros::delay(650);
   chassis.pid_turn_set(213_deg, TURN_SPEED);
   pros::delay(600);
   matchloader.set(false);
-  chassis.pid_drive_set(-19_in, 127);
-  pros::delay(500);
+  chassis.pid_drive_set(-21_in, 127);
+  pros::delay(600);
   chassis.pid_swing_set(LEFT_SWING, 90_deg, SWING_SPEED, -10);
   pros::delay(500);
   chassis.drive_set(-127, -127);
-  pros::delay(200);
+  pros::delay(800);
   pros::Task scoreTask(score);
 }
 
@@ -197,7 +197,7 @@ void sawp(){
   chassis.pid_drive_set(33_in, 67);
   pros::delay(700);
   blocker.set(false);
-  chassis.drive_set(50, 50);
+  chassis.drive_set(20, 20);
   pros::delay(650);
   chassis.pid_drive_set(-11_in, DRIVE_SPEED);
   pros::delay(700);
@@ -216,18 +216,43 @@ void sawp(){
 
 void nine_ball_right_wing(){
   six_ball_starter();
+  pros::delay(200);
   matchloader.set(true);
-  pros::delay(1200);
-  blocker.set(false);
-  chassis.pid_drive_set(33_in, DRIVE_SPEED);
-  pros::delay(1500);
-  chassis.pid_drive_set(-11_in, DRIVE_SPEED);
   pros::delay(700);
-  chassis.pid_turn_set(225_deg, TURN_SPEED);
+  chassis.pid_turn_set(92.5_deg, TURN_SPEED);
+  pros::delay(100);
+  chassis.pid_drive_set(33_in, 60);
+  pros::delay(900);
+  blocker.set(false);
+  chassis.drive_set(50, 50);
+  pros::delay(750);
+  chassis.pid_drive_set(-9_in, DRIVE_SPEED);
+  pros::delay(700);
   matchloader.set(false);
+  chassis.pid_turn_set(225_deg, TURN_SPEED);
+  pros::delay(750);
+  chassis.pid_drive_set(50_in, DRIVE_SPEED);
+  pros::delay(950);
+  intake.move(-100);
+  pros::delay(1100);
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED);
+  wing.set(false);
+  pros::delay(800);
+  chassis.pid_turn_set(270_deg, TURN_SPEED);
   pros::delay(500);
-  chassis.pid_drive_set(51_in, DRIVE_SPEED);
-  pros::delay(1400);
-  intake.move(-127);
+  chassis.pid_drive_set(25_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_set(240_deg, 100);
+  chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
+  start_down = true;
   pros::delay(1000);
+}
+
+void skills(){
+  intake.move(127);
+  chassis.odom_xyt_set(0, 0, 0);
+  // chassis.pid_drive_set(-10, DRIVE_SPEED);
+  // pros::delay(1000);
+  chassis.pid_drive_set(50_in, 90);
+  pros::delay(5000);
 }
