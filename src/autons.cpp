@@ -53,30 +53,33 @@ void default_constants() {
 void score_high_auto(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   intake.move(127);
-  lever.move(100);
+  lever.move(127);
   blocker.set(true);
-  pros::delay(800);
+  pros::delay(200);
+  lever.move(80);
+  pros::delay(600);
   intake.move(-127);
   lever.move(-127);
   pros::delay(1000);
   lever.move_velocity(0);
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
   intake.move(127);
-  blocker.set(false);
 }
 
-void score_mid_auto(){
+void score_mid_auto(bool backUp){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   intake.move(127);
-  lever.move_velocity(80);
+  lever.move_velocity(70);
   blocker.set(true);
   pros::delay(1000);
-  lever.move(-127);
-  pros::delay(400);
-  lever.move_velocity(0);
-  lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  intake.move(127);
-  blocker.set(false);
+  if (backUp){
+    lever.move(-127);
+    pros::delay(400);
+    lever.move_velocity(0);
+    lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    intake.move(127);
+    blocker.set(false);
+  }
 }
 
 void six_ball_starter(){
@@ -87,19 +90,19 @@ void six_ball_starter(){
   pros::delay(200);
   intake.move(127);
   chassis.pid_drive_set(38_in, DRIVE_SPEED);
-  pros::delay(100);
+  pros::delay(300);
   matchloader.set(true);
-  pros::delay(900);
-  chassis.pid_turn_set(345_deg, TURN_SPEED);
-  pros::delay(500);
+  pros::delay(650);
+  chassis.pid_turn_set(340_deg, TURN_SPEED);
+  pros::delay(400);
   matchloader.set(false);
-  chassis.pid_drive_set(15_in, 90);
-  pros::delay(200);
+  chassis.pid_drive_set(16_in, 90);
+  pros::delay(300);
   matchloader.set(true);
-  pros::delay(700);
-  chassis.pid_drive_set(-17_in, 90);
-  pros::delay(700);
-  chassis.pid_turn_set(225_deg, TURN_SPEED);
+  pros::delay(400);
+  chassis.pid_drive_set(-18_in, 90);
+  pros::delay(600);
+  chassis.pid_turn_set(213_deg, TURN_SPEED);
   pros::delay(600);
   matchloader.set(false);
   chassis.pid_drive_set(-19_in, 127);
@@ -125,12 +128,12 @@ void six_ball_right_wing(){
   chassis.pid_drive_set(-25_in, DRIVE_SPEED);
   pros::delay(700);
   chassis.pid_turn_set(110_deg, 50);
+  chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
 }
 
 void six_ball_right_score(){
   six_ball_starter();
   pros::delay(3000);
-  pros::Task scoreTask2(score);
 }
 
 
@@ -139,50 +142,60 @@ void sawp(){
   wing.set(true);
   chassis.drive_brake_set(MOTOR_BRAKE_BRAKE);
   intake.move(127);
-  chassis.pid_drive_set(7.5_in, DRIVE_SPEED);
-  chassis.pid_wait_quick();
-  chassis.pid_drive_set(-46_in, DRIVE_SPEED);
+  chassis.pid_drive_set(9_in, DRIVE_SPEED);
+  pros::delay(800);
+  chassis.pid_drive_set(-48_in, DRIVE_SPEED);
   pros::delay(100);
   matchloader.set(true);
   pros::delay(1000);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
-  pros::delay(500);
+  pros::delay(600);
   chassis.pid_drive_set(15_in, 70);
-  pros::delay(1000);
+  pros::delay(500);
+  chassis.drive_set(50, 50);
+  pros::delay(450);
   chassis.pid_drive_set(-30_in, DRIVE_SPEED);
   pros::delay(840);
   chassis.drive_set(-127, -127);
   matchloader.set(false);
   pros::Task scoreTask(score_high_auto);
-  pros::delay(800);
-  chassis.pid_turn_set(210_deg, TURN_SPEED);
-  pros::delay(800);
-  chassis.pid_drive_set(8_in, DRIVE_SPEED);
+  pros::delay(600);
+
+
+  chassis.pid_swing_set(LEFT_SWING, 195_deg, 70, -127);
+  pros::delay(900);
+  blocker.set(false);
+  chassis.pid_drive_set(6_in, DRIVE_SPEED);
+  blocker.set(false);
+  pros::delay(300);
   matchloader.set(true);
-  pros::delay(500);
+  pros::delay(200);
   chassis.pid_turn_set(180_deg, TURN_SPEED);
   pros::delay(200);
   matchloader.set(false);
   chassis.pid_drive_set(46_in, DRIVE_SPEED);
-  pros::delay(400);
+  pros::delay(900);
   matchloader.set(true);
-  pros::delay(600);
-  chassis.pid_turn_set(160_deg, TURN_SPEED);
-  pros::delay(500);
-  chassis.pid_drive_set(28_in, DRIVE_SPEED);
+  pros::delay(100);
+  chassis.pid_turn_set(150_deg, TURN_SPEED);
+  pros::delay(300);
+  chassis.pid_drive_set(36_in, DRIVE_SPEED);
   pros::delay(1000);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
   pros::delay(500);
   chassis.pid_drive_set(-18_in, DRIVE_SPEED);
-  pros::delay(800);
+  pros::delay(400);
   chassis.drive_set(-127, -127);
-  matchloader.set(false);
   pros::Task scoreTask2(score_high_auto);
-  pros::delay(1000);
+  blocker.set(false);
+  chassis.pid_turn_set(88.5_deg, TURN_SPEED);
+  pros::delay(700);
   chassis.pid_drive_set(33_in, 70);
-  matchloader.set(true);
-  pros::delay(1600);
-  chassis.pid_drive_set(-15_in, DRIVE_SPEED);
+  pros::delay(700);
+  blocker.set(false);
+  chassis.drive_set(50, 50);
+  pros::delay(650);
+  chassis.pid_drive_set(-12_in, DRIVE_SPEED);
   pros::delay(700);
   lift.set(true);
   lift_toggle = true;
@@ -190,13 +203,14 @@ void sawp(){
   pros::delay(500);
   chassis.pid_drive_set(-50_in, DRIVE_SPEED);
   pros::delay(1000);
-  score_mid_auto();
+  score_mid_auto(false);
 }
 
 void nine_ball_right_wing(){
   six_ball_starter();
   matchloader.set(true);
   pros::delay(1200);
+  blocker.set(false);
   chassis.pid_drive_set(33_in, DRIVE_SPEED);
   pros::delay(1500);
   chassis.pid_drive_set(-11_in, DRIVE_SPEED);

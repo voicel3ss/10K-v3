@@ -7,6 +7,9 @@ ez::Drive chassis(
     2.75,
     600);
 
+pros::MotorGroup left_motors({-6, 8, -5});
+pros::MotorGroup right_motors({9, -10, 7});
+
 ez::tracking_wheel horiz_tracker(
     -3,     // Port
     2,     // Wheel Diameter
@@ -87,6 +90,10 @@ void score_driver(){
 
 
 void controls() {
+  lever.move(-127);
+  pros::delay(800);
+  lever.set_zero_position(0);
+  lever.move(0);
   while (true) {
     bool r1_new = master.get_digital_new_press(DIGITAL_R1);
     bool l1_new = master.get_digital_new_press(DIGITAL_L1);
@@ -139,6 +146,18 @@ void controls() {
   }
 }
 
+void controller_update(){
+  while (true) {
+    master.clear();
+    master.print(0, 0, "Battery%: %d%%", master.get_battery_capacity());
+    master.print(1, 0, "Intake: %dC", intake.get_temperature());
+    master.print(2, 0, "Lever: %dC", lever.get_temperature());
+    master.print(3, 0, "DriveL: %dC", left_motors.get_temperature());
+    master.print(4, 0, "DriveR: %dC", right_motors.get_temperature());
+    pros::delay(1000);
+  }
+}
+
 void initialize() {
   ez::ez_template_print();
   pros::delay(500);
@@ -149,8 +168,8 @@ void initialize() {
 
   ez::as::auton_selector.autons_add({
     {"SAWP", sawp},
+    {"Six Ball Right Wing", six_ball_right_wing},
       {"Nine Ball Right Wing", nine_ball_right_wing},
-      {"Six Ball Right Wing", six_ball_right_wing},
       {"Six Ball Right Score", six_ball_right_score},
   });
 
@@ -169,7 +188,6 @@ void initialize() {
 
 
   master.set_text(0, 0, drive_arcade ? "Drive: Arcade" : "Drive: Tank");
-  pros::Task controlTask(controls);
   ez::as::initialize();
   pros::lcd::initialize();
 
@@ -186,6 +204,7 @@ void initialize() {
   // });
 
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  pros::Task controller_task(controller_update);
 }
 
 void disabled() {
@@ -267,6 +286,7 @@ void ez_template_extras() {
 
 void opcontrol() {
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+  pros::Task controlTask(controls);
 
   while (true) {
     ez_template_extras();
