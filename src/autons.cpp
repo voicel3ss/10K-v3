@@ -235,7 +235,7 @@ void nine_ball_right_wing(){
   pros::delay(950);
   intake.move(-100);
   pros::delay(1100);
-  chassis.pid_drive_set(-31_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-32_in, DRIVE_SPEED);
   wing.set(false);
   pros::delay(800);
   chassis.pid_turn_set(270_deg, TURN_SPEED);
