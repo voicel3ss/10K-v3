@@ -13,6 +13,7 @@ extern Piston matchloader;
 extern Piston wing;
 extern bool lift_toggle;
 extern bool wing_toggle;
+extern bool start_down;
 
 void score();
 

@@ -29,6 +29,7 @@ bool reverse_toggle = false;
 bool lift_toggle = false;
 bool wing_toggle = false;
 bool matchloader_toggle = false;
+bool start_down = false;
 
 void score(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -45,7 +46,7 @@ void score(){
   } else {
     intake.move(127);
     intake_toggle = true;
-    lever.move_velocity(150);
+    lever.move_velocity(70);
     blocker.set(true);
     pros::delay(1000);
     lever.move(-127);
@@ -74,7 +75,7 @@ void score_driver(){
   } else {
     intake.move(127);
     intake_toggle = true;
-    lever.move_velocity(150);
+    lever.move_velocity(100);
     blocker.set(true);
     pros::delay(1000);
     while (master.get_digital(DIGITAL_R2)) {
@@ -111,7 +112,11 @@ void controls() {
       wing_toggle = false;
     } else if (r1) {
       wing_toggle = false;
-    } else if (!r1) {
+      start_down = false;
+    } else if (start_down){
+      wing_toggle = false;
+    }
+      else if (!r1 && !start_down) {
       wing_toggle = true;
     }
 
@@ -204,7 +209,7 @@ void initialize() {
   // });
 
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  pros::Task controller_task(controller_update);
+  //pros::Task controller_task(controller_update);
 }
 
 void disabled() {
@@ -297,7 +302,7 @@ void opcontrol() {
       chassis.opcontrol_tank();
 
     if (reverse_toggle) {
-      intake.move(-127);
+      intake.move(-90);
     }
 
     if (intake_toggle && !reverse_toggle) {
