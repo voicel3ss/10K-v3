@@ -109,10 +109,11 @@ void six_ball_starter(){
   matchloader.set(false);
   chassis.pid_drive_set(-21_in, 127);
   pros::delay(600);
-  chassis.pid_swing_set(LEFT_SWING, 90_deg, SWING_SPEED, -10);
+  chassis.pid_swing_set(LEFT_SWING, 90_deg, -127, -6);
   pros::delay(500);
   chassis.drive_set(-127, -127);
   pros::delay(800);
+  chassis.pid_turn_set(90_deg, TURN_SPEED);
   pros::Task scoreTask(score);
 }
 
@@ -220,7 +221,7 @@ void nine_ball_right_wing(){
   matchloader.set(true);
   pros::delay(700);
   chassis.pid_turn_set(92.5_deg, TURN_SPEED);
-  pros::delay(100);
+  pros::delay(200);
   chassis.pid_drive_set(33_in, 60);
   pros::delay(900);
   blocker.set(false);
