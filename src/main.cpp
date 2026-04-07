@@ -172,10 +172,10 @@ void initialize() {
   //  - ignore this if you aren't using a horizontal tracker
 
   ez::as::auton_selector.autons_add({
+    {"SAWP", sawp},
     {"Nine Ball Right Wing", nine_ball_right_wing},
     {"Six Ball Right Wing", six_ball_right_wing},
     {"Six Ball Right Score", six_ball_right_score},
-    {"SAWP", sawp},
     {"Skills", skills},
   });
 
