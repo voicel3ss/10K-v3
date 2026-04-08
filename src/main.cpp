@@ -38,7 +38,7 @@ void score(){
     intake_toggle = true;
     lever.move(127);
     blocker.set(true);
-    pros::delay(800);
+    pros::delay(1000);
     lever.move(-127);
     intake_toggle = false;
     pros::delay(1000);
@@ -48,7 +48,7 @@ void score(){
     intake_toggle = true;
     lever.move_velocity(70);
     blocker.set(true);
-    pros::delay(1000);
+    pros::delay(1200);
     lever.move(-127);
     intake_toggle = false;
     pros::delay(400);
@@ -64,7 +64,7 @@ void score_driver(){
     intake_toggle = true;
     lever.move(127);
     blocker.set(true);
-    pros::delay(800);
+    pros::delay(1000);
     while (master.get_digital(DIGITAL_R2)) {
       pros::delay(ez::util::DELAY_TIME);
     }
@@ -83,7 +83,7 @@ void score_driver(){
     }
     lever.move(-127);
     intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(1200);
     lever.move_velocity(0);
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -173,9 +173,9 @@ void initialize() {
 
   ez::as::auton_selector.autons_add({
     {"SAWP", sawp},
-    {"Nine Ball Right Wing", nine_ball_right_wing},
-    {"Six Ball Right Wing", six_ball_right_wing},
-    {"Six Ball Right Score", six_ball_right_score},
+    // {"Nine Ball Right Wing", nine_ball_right_wing},
+    // {"Six Ball Right Wing", six_ball_right_wing},
+    // {"Six Ball Right Score", six_ball_right_score},
     {"Skills", skills},
   });
 

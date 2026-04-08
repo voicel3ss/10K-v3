@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "10K_v3_0.4",
+    "project_name": "10K_v3_ez",
     "target": "v5",
     "templates": {
       "EZ-Template": {
@@ -424,7 +424,7 @@
       }
     },
     "upload_options": {
-      "description": "roboticsisez.com"
+      "description": "eztemp"
     },
     "use_early_access": false
   }
