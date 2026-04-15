@@ -17,7 +17,7 @@ void default_constants() {
   // P, I, D, and Start I
   chassis.pid_drive_constants_set(8.6, 0.0, 16.0);         // Fwd/rev constants, used for odom and non odom motions
   chassis.pid_heading_constants_set(11.0, 0.0, 28.0);        // Holds the robot straight while going forward without odom
-  chassis.pid_turn_constants_set(3.0, 0.00, 20.0, 0);     // Turn in place constants
+  chassis.pid_turn_constants_set(3.0, 0.00, 24.0, 0);     // Turn in place constants
   chassis.pid_swing_constants_set(7.25, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
   chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
@@ -117,6 +117,7 @@ void six_ball_starter(){
   pros::Task scoreTask(score);
 }
 
+
 void six_ball_right_wing(){
   six_ball_starter();
   pros::delay(800);
@@ -148,21 +149,21 @@ void sawp(){
   intake.move(127);
   chassis.pid_drive_set(9_in, DRIVE_SPEED);
   pros::delay(800);
-  chassis.pid_drive_set(-48_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-50_in, DRIVE_SPEED);
   matchloader.set(true);
-  pros::delay(1150);
+  pros::delay(1250);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
   pros::delay(550);
-  chassis.pid_drive_set(15_in, 70);
+  chassis.pid_drive_set(15_in, 60);
   pros::delay(600);
   chassis.drive_set(50, 50);
-  pros::delay(400);
+  pros::delay(450);
   chassis.pid_drive_set(-30_in, DRIVE_SPEED);
   pros::delay(900);
   chassis.drive_set(-127, -127);
   matchloader.set(false);
   pros::Task scoreTask(score_high_auto);
-  pros::delay(600);
+  pros::delay(700);
   chassis.pid_swing_set(LEFT_SWING, 190_deg, 70, -127);
   pros::delay(500);
   blocker.set(false);
@@ -188,16 +189,16 @@ void sawp(){
   chassis.drive_set(-127, -127);
   pros::Task scoreTask2(score_high_auto);
   blocker.set(false);
-  pros::delay(600);
+  pros::delay(700);
   //chassis.pid_turn_set(88.5_deg, TURN_SPEED);
   ///pros::delay(50);
-  chassis.pid_drive_set(34_in, 70);
-  pros::delay(700);
+  chassis.pid_drive_set(34_in, 65);
+  pros::delay(800);
   blocker.set(false);
   chassis.drive_set(20, 20);
-  pros::delay(650);
+  pros::delay(750);
   chassis.pid_drive_set(-10_in, DRIVE_SPEED);
-  pros::delay(550);
+  pros::delay(600);
   lift.set(true);
   lift_toggle = true;
   chassis.pid_turn_set(135_deg, TURN_SPEED);
@@ -206,9 +207,9 @@ void sawp(){
   pros::delay(420);
   score_mid_auto(false);
   chassis.pid_wait();
-  //chassis.drive_set(-20, -20);
-  lift.set(false);
-  lift_toggle = false;
+  chassis.drive_set(-20, -20);
+  // lift.set(false);
+  // lift_toggle = false;
 }
 
 void nine_ball_right_wing(){

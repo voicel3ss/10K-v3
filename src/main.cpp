@@ -23,34 +23,35 @@ ez::Piston lift('G');
 ez::Piston matchloader('H');
 ez::Piston wing('C');
 
-bool drive_arcade = false;
+bool drive_arcade = true;
 bool intake_toggle = false;
 bool reverse_toggle = false;
 bool lift_toggle = false;
 bool wing_toggle = false;
 bool matchloader_toggle = false;
 bool start_down = false;
+bool score_intake_toggle = false;
 
 void score(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle){
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move(127);
     blocker.set(true);
     pros::delay(1000);
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(1000);
     lever.move_velocity(0);
   } else {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move_velocity(70);
     blocker.set(true);
     pros::delay(1200);
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(400);
     lever.move_velocity(0);
   }
@@ -60,8 +61,8 @@ void score(){
 void score_driver(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle){
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move(127);
     blocker.set(true);
     pros::delay(1000);
@@ -69,12 +70,12 @@ void score_driver(){
       pros::delay(ez::util::DELAY_TIME);
     }
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(400);
     lever.move_velocity(0);
   } else {
-    intake.move(127);
-    intake_toggle = true;
+    intake.move(-50);
+    score_intake_toggle = true;
     lever.move_velocity(100);
     blocker.set(true);
     pros::delay(1000);
@@ -82,13 +83,43 @@ void score_driver(){
       pros::delay(ez::util::DELAY_TIME);
     }
     lever.move(-127);
-    intake_toggle = false;
+    score_intake_toggle = false;
     pros::delay(1200);
     lever.move_velocity(0);
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
+void score_three()
+{
+  lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  if (!lift_toggle)
+  {
+    intake.move(-50);
+    score_intake_toggle = true;
+    //lever.move(127);
+    lever.move_relative(500, 127);
+    blocker.set(true);
+    pros::delay(700);
+    lever.move(-127);
+    score_intake_toggle = false;
+    pros::delay(1000);
+    lever.move_velocity(0);
+  }
+  else
+  {
+    intake.move(-50);
+    score_intake_toggle = true;
+    lever.move_velocity(70);
+    blocker.set(true);
+    pros::delay(300);
+    lever.move(-127);
+    score_intake_toggle = false;
+    pros::delay(400);
+    lever.move_velocity(0);
+  }
+  lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+}
 
 void controls() {
   lever.move(-127);
@@ -147,6 +178,12 @@ void controls() {
     if (master.get_digital_new_press(DIGITAL_R2)) {
       pros::Task score_task(score_driver);
     }
+
+    if (master.get_digital_new_press(DIGITAL_B))
+    {
+      pros::Task score_task(score_three);
+    }
+
     pros::delay(ez::util::DELAY_TIME);
   }
 }
@@ -302,16 +339,20 @@ void opcontrol() {
     else
       chassis.opcontrol_tank();
 
-    if (reverse_toggle) {
+    if (reverse_toggle)
+    {
       intake.move(-90);
     }
 
-    if (intake_toggle && !reverse_toggle) {
+    if (score_intake_toggle){
+      intake.move(-50);
+    } else if (intake_toggle && !reverse_toggle)
+    {
       intake.move(127);
-    } else if (!reverse_toggle) {
+    } else if (!reverse_toggle)
+    {
       intake.move(0);
     }
-
     matchloader.set(matchloader_toggle);
     lift.set(lift_toggle);
     wing.set(wing_toggle);
