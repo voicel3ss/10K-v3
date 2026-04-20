@@ -341,7 +341,7 @@ void opcontrol() {
 
     if (reverse_toggle)
     {
-      intake.move(-65);
+      intake.move(-55);
     }
 
     if (score_intake_toggle){

@@ -16,7 +16,7 @@ const int SWING_SPEED = 110;
 void default_constants() {
   // P, I, D, and Start I
   chassis.pid_drive_constants_set(8.6, 0.0, 16.0);         // Fwd/rev constants, used for odom and non odom motions
-  chassis.pid_heading_constants_set(11.0, 0.0, 30.0);        // Holds the robot straight while going forward without odom
+  chassis.pid_heading_constants_set(10.0, 0.0, 28.0);        // Holds the robot straight while going forward without odom
   chassis.pid_turn_constants_set(3.0, 0.00, 24.0, 0);     // Turn in place constants
   chassis.pid_swing_constants_set(7.25, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
@@ -69,10 +69,10 @@ void score_high_auto(){
 void score_mid_auto(bool backUp){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   intake.move(127);
-  lever.move_velocity(40);
+  lever.move_velocity(30);
   blocker.set(true);
   pros::delay(500);
-  lever.move_velocity(100);
+  lever.move_velocity(80);
   pros::delay(500);
   if (backUp){
     lever.move(-127);
@@ -149,7 +149,7 @@ void sawp(){
   intake.move(127);
   chassis.pid_drive_set(9_in, DRIVE_SPEED);
   pros::delay(800);
-  chassis.pid_drive_set(-50_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-51_in, DRIVE_SPEED);
   matchloader.set(true);
   pros::delay(1250);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
@@ -159,15 +159,15 @@ void sawp(){
   chassis.drive_set(50, 50);
   pros::delay(450);
   chassis.pid_drive_set(-30_in, DRIVE_SPEED);
-  pros::delay(900);
+  pros::delay(1000);
   chassis.drive_set(-127, -127);
   matchloader.set(false);
   pros::Task scoreTask(score_high_auto);
-  pros::delay(700);
-  chassis.pid_swing_set(LEFT_SWING, 190_deg, 70, -127);
-  pros::delay(500);
+  pros::delay(800);
+  chassis.pid_swing_set(LEFT_SWING, 195_deg, 70, -127);
+  pros::delay(600);
   blocker.set(false);
-  chassis.pid_drive_set(7_in, DRIVE_SPEED);
+  chassis.pid_drive_set(9.5_in, DRIVE_SPEED);
   pros::delay(500);
   chassis.pid_turn_set(180_deg, TURN_SPEED);
   pros::delay(150);
@@ -176,12 +176,12 @@ void sawp(){
   matchloader.set(true);
   pros::delay(300);
   matchloader.set(false);
-  pros::delay(660);
+  pros::delay(610);
   matchloader.set(true);
   pros::delay(100);
   chassis.pid_turn_set(150_deg, TURN_SPEED);
   pros::delay(300);
-  chassis.pid_drive_set(33.5_in, DRIVE_SPEED);
+  chassis.pid_drive_set(31.5_in, DRIVE_SPEED);
   pros::delay(900);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
   pros::delay(400);
@@ -204,7 +204,7 @@ void sawp(){
   lift_toggle = true;
   chassis.pid_turn_set(135_deg, TURN_SPEED);
   pros::delay(500);
-  chassis.pid_drive_set(-48.5_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-49_in, DRIVE_SPEED);
   pros::delay(420);
   score_mid_auto(false);
   chassis.pid_wait();
