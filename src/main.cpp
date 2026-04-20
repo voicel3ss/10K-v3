@@ -39,10 +39,10 @@ void score(){
     score_intake_toggle = true;
     lever.move(127);
     blocker.set(true);
-    pros::delay(1000);
+    pros::delay(800);
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(700);
     lever.move_velocity(0);
   } else {
     intake.move(-50);
@@ -65,7 +65,7 @@ void score_driver(){
     score_intake_toggle = true;
     lever.move(127);
     blocker.set(true);
-    pros::delay(1000);
+    pros::delay(800);
     while (master.get_digital(DIGITAL_R2)) {
       pros::delay(ez::util::DELAY_TIME);
     }
@@ -84,7 +84,7 @@ void score_driver(){
     }
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1200);
+    pros::delay(600);
     lever.move_velocity(0);
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -95,7 +95,7 @@ void score_three()
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle)
   {
-    intake.move(-50);
+    intake.move(0);
     score_intake_toggle = true;
     //lever.move(127);
     lever.move_relative(500, 127);
@@ -103,12 +103,12 @@ void score_three()
     pros::delay(700);
     lever.move(-127);
     score_intake_toggle = false;
-    pros::delay(1000);
+    pros::delay(450);
     lever.move_velocity(0);
   }
   else
   {
-    intake.move(-50);
+    intake.move(0);
     score_intake_toggle = true;
     lever.move_velocity(70);
     blocker.set(true);

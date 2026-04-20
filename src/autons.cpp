@@ -16,7 +16,7 @@ const int SWING_SPEED = 110;
 void default_constants() {
   // P, I, D, and Start I
   chassis.pid_drive_constants_set(8.6, 0.0, 16.0);         // Fwd/rev constants, used for odom and non odom motions
-  chassis.pid_heading_constants_set(11.0, 0.0, 28.0);        // Holds the robot straight while going forward without odom
+  chassis.pid_heading_constants_set(11.0, 0.0, 30.0);        // Holds the robot straight while going forward without odom
   chassis.pid_turn_constants_set(3.0, 0.00, 24.0, 0);     // Turn in place constants
   chassis.pid_swing_constants_set(7.25, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
@@ -171,11 +171,12 @@ void sawp(){
   pros::delay(500);
   chassis.pid_turn_set(180_deg, TURN_SPEED);
   pros::delay(150);
+  chassis.pid_drive_set(51_in, DRIVE_SPEED);
+  pros::delay(50);
   matchloader.set(true);
-  chassis.pid_drive_set(49_in, DRIVE_SPEED);
   pros::delay(300);
   matchloader.set(false);
-  pros::delay(600);
+  pros::delay(660);
   matchloader.set(true);
   pros::delay(100);
   chassis.pid_turn_set(150_deg, TURN_SPEED);
@@ -192,7 +193,7 @@ void sawp(){
   pros::delay(700);
   //chassis.pid_turn_set(88.5_deg, TURN_SPEED);
   ///pros::delay(50);
-  chassis.pid_drive_set(34_in, 65);
+  chassis.pid_drive_set(36_in, 65);
   pros::delay(800);
   blocker.set(false);
   chassis.drive_set(20, 20);
@@ -203,7 +204,7 @@ void sawp(){
   lift_toggle = true;
   chassis.pid_turn_set(135_deg, TURN_SPEED);
   pros::delay(500);
-  chassis.pid_drive_set(-49_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-48.5_in, DRIVE_SPEED);
   pros::delay(420);
   score_mid_auto(false);
   chassis.pid_wait();
