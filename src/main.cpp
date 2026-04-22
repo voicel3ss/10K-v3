@@ -12,7 +12,7 @@ pros::MotorGroup right_motors({9, -10, 7});
 
 ez::tracking_wheel horiz_tracker(
     -3,     // Port
-    2,     // Wheel Diameter
+    2,      // Wheel Diameter
     4.45);  // Distance to center of robot
 
 pros::Motor intake(2);
@@ -23,7 +23,7 @@ ez::Piston lift('G');
 ez::Piston matchloader('H');
 ez::Piston wing('C');
 
-bool drive_arcade = true;
+bool drive_arcade = false;
 bool intake_toggle = false;
 bool reverse_toggle = false;
 bool lift_toggle = false;
@@ -32,9 +32,9 @@ bool matchloader_toggle = false;
 bool start_down = false;
 bool score_intake_toggle = false;
 
-void score(){
+void score() {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  if (!lift_toggle){
+  if (!lift_toggle) {
     intake.move(-50);
     score_intake_toggle = true;
     lever.move(127);
@@ -58,9 +58,9 @@ void score(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
-void score_driver(){
+void score_driver() {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  if (!lift_toggle){
+  if (!lift_toggle) {
     intake.move(-50);
     score_intake_toggle = true;
     lever.move(127);
@@ -90,14 +90,12 @@ void score_driver(){
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
-void score_three()
-{
+void score_three() {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  if (!lift_toggle)
-  {
+  if (!lift_toggle) {
     intake.move(0);
     score_intake_toggle = true;
-    //lever.move(127);
+    // lever.move(127);
     lever.move_relative(500, 127);
     blocker.set(true);
     pros::delay(700);
@@ -105,9 +103,7 @@ void score_three()
     score_intake_toggle = false;
     pros::delay(450);
     lever.move_velocity(0);
-  }
-  else
-  {
+  } else {
     intake.move(0);
     score_intake_toggle = true;
     lever.move_velocity(70);
@@ -139,19 +135,18 @@ void controls() {
     } else if (l1_new) {
       intake_toggle = !intake_toggle;
       blocker.set(false);
-    } else if (lift_toggle){
+    } else if (lift_toggle) {
       wing_toggle = false;
     } else if (r1) {
       wing_toggle = false;
       start_down = false;
-    } else if (start_down){
+    } else if (start_down) {
       wing_toggle = false;
-    }
-      else if (!r1 && !start_down) {
+    } else if (!r1 && !start_down) {
       wing_toggle = true;
     }
 
-    if (master.get_digital_new_press(DIGITAL_X)){
+    if (master.get_digital_new_press(DIGITAL_X)) {
       lever.move(-127);
       pros::delay(800);
       lever.set_zero_position(0);
@@ -179,8 +174,7 @@ void controls() {
       pros::Task score_task(score_driver);
     }
 
-    if (master.get_digital_new_press(DIGITAL_B))
-    {
+    if (master.get_digital_new_press(DIGITAL_B)) {
       pros::Task score_task(score_three);
     }
 
@@ -188,7 +182,7 @@ void controls() {
   }
 }
 
-void controller_update(){
+void controller_update() {
   while (true) {
     master.clear();
     master.print(0, 0, "Battery%: %d%%", master.get_battery_capacity());
@@ -209,11 +203,11 @@ void initialize() {
   //  - ignore this if you aren't using a horizontal tracker
 
   ez::as::auton_selector.autons_add({
-    {"SAWP", sawp},
-    // {"Nine Ball Right Wing", nine_ball_right_wing},
-    // {"Six Ball Right Wing", six_ball_right_wing},
-    // {"Six Ball Right Score", six_ball_right_score},
-    {"Skills", skills},
+      {"SAWP", sawp},
+      // {"Nine Ball Right Wing", nine_ball_right_wing},
+      // {"Six Ball Right Wing", six_ball_right_wing},
+      // {"Six Ball Right Score", six_ball_right_score},
+      {"Skills", skills},
   });
 
   chassis.odom_tracker_back_set(&horiz_tracker);
@@ -228,7 +222,6 @@ void initialize() {
   chassis.drive_imu_reset();
   chassis.drive_sensor_reset();
   chassis.odom_xyt_set(0_in, 0_in, 0_deg);
-
 
   master.set_text(0, 0, drive_arcade ? "Drive: Arcade" : "Drive: Tank");
   ez::as::initialize();
@@ -247,7 +240,7 @@ void initialize() {
   // });
 
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  //pros::Task controller_task(controller_update);
+  // pros::Task controller_task(controller_update);
 }
 
 void disabled() {
@@ -339,19 +332,20 @@ void opcontrol() {
     else
       chassis.opcontrol_tank();
 
-    if (reverse_toggle)
-    {
-      intake.move(-55);
-    }
+    if (master.get_digital(DIGITAL_Y)) {
+      intake.move(-127);
+    } else {
+      if (reverse_toggle) {
+        intake.move(-55);
+      }
 
-    if (score_intake_toggle){
-      intake.move(-50);
-    } else if (intake_toggle && !reverse_toggle)
-    {
-      intake.move(127);
-    } else if (!reverse_toggle)
-    {
-      intake.move(0);
+      if (score_intake_toggle) {
+        intake.move(-50);
+      } else if (intake_toggle && !reverse_toggle) {
+        intake.move(127);
+      } else if (!reverse_toggle) {
+        intake.move(0);
+      }
     }
     matchloader.set(matchloader_toggle);
     lift.set(lift_toggle);
