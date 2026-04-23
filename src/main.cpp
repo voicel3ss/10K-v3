@@ -31,29 +31,36 @@ bool wing_toggle = false;
 bool matchloader_toggle = false;
 bool start_down = false;
 bool score_intake_toggle = false;
+bool score_outtake_toggle = false;
 
 void score() {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle) {
-    intake.move(-50);
     score_intake_toggle = true;
+    intake.move(127);
     lever.move(127);
     blocker.set(true);
     pros::delay(800);
-    lever.move(-127);
     score_intake_toggle = false;
+    score_outtake_toggle = true;
+    intake.move(-50);
+    lever.move(-127);
     pros::delay(700);
     lever.move_velocity(0);
+    score_outtake_toggle = false;
   } else {
-    intake.move(-50);
+    intake.move(127);
     score_intake_toggle = true;
     lever.move_velocity(70);
     blocker.set(true);
     pros::delay(1200);
-    lever.move(-127);
     score_intake_toggle = false;
+    score_outtake_toggle = true;
+    intake.move(-50);
+    lever.move(-127);
     pros::delay(400);
     lever.move_velocity(0);
+    score_outtake_toggle = false;
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
@@ -61,20 +68,23 @@ void score() {
 void score_driver() {
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   if (!lift_toggle) {
-    intake.move(-50);
     score_intake_toggle = true;
+    intake.move(127);
     lever.move(127);
     blocker.set(true);
     pros::delay(800);
     while (master.get_digital(DIGITAL_R2)) {
       pros::delay(ez::util::DELAY_TIME);
     }
-    lever.move(-127);
     score_intake_toggle = false;
+    score_outtake_toggle = true;
+    intake.move(-50);
+    lever.move(-127);
     pros::delay(400);
     lever.move_velocity(0);
+    score_outtake_toggle = false;
   } else {
-    intake.move(-50);
+    intake.move(127);
     score_intake_toggle = true;
     lever.move_velocity(100);
     blocker.set(true);
@@ -82,10 +92,13 @@ void score_driver() {
     while (master.get_digital(DIGITAL_R2)) {
       pros::delay(ez::util::DELAY_TIME);
     }
-    lever.move(-127);
     score_intake_toggle = false;
+    score_outtake_toggle = true;
+    intake.move(-50);
+    lever.move(-127);
     pros::delay(600);
     lever.move_velocity(0);
+    score_outtake_toggle = false;
   }
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
@@ -182,18 +195,6 @@ void controls() {
   }
 }
 
-void controller_update() {
-  while (true) {
-    master.clear();
-    master.print(0, 0, "Battery%: %d%%", master.get_battery_capacity());
-    master.print(1, 0, "Intake: %dC", intake.get_temperature());
-    master.print(2, 0, "Lever: %dC", lever.get_temperature());
-    master.print(3, 0, "DriveL: %dC", left_motors.get_temperature());
-    master.print(4, 0, "DriveR: %dC", right_motors.get_temperature());
-    pros::delay(1000);
-  }
-}
-
 void initialize() {
   ez::ez_template_print();
   pros::delay(500);
@@ -240,7 +241,6 @@ void initialize() {
   // });
 
   lever.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  // pros::Task controller_task(controller_update);
 }
 
 void disabled() {
@@ -320,8 +320,28 @@ void ez_template_extras() {
   }
 }
 
+void controller_text(){
+  bool rumbled = false;
+  while (true) {
+    if (intake_toggle) {
+      rumbled = true;
+      master.print(1, 0, "on   ");
+      pros::screen::set_pen(pros::Color::red);
+	    pros::screen::fill_rect(0, 0, 5000, 5000);
+    } else {
+      rumbled = false;
+      pros::screen::set_pen(pros::Color::black);
+      pros::screen::fill_rect(0, 0, 5000, 5000);
+      master.print(1, 0, "off  ");
+    }
+    pros::delay(90);
+  }
+}
+
 void opcontrol() {
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+  lift_toggle = false;
+  pros::Task controllerTask(controller_text);
   pros::Task controlTask(controls);
 
   while (true) {
@@ -340,6 +360,8 @@ void opcontrol() {
       }
 
       if (score_intake_toggle) {
+        intake.move(127);
+      } else if (score_outtake_toggle) {
         intake.move(-50);
       } else if (intake_toggle && !reverse_toggle) {
         intake.move(127);
