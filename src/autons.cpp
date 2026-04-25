@@ -175,12 +175,12 @@ void sawp(){
   matchloader.set(true);
   pros::delay(300);
   matchloader.set(false);
-  pros::delay(590);
+  pros::delay(550);
   matchloader.set(true);
-  pros::delay(100);
+  pros::delay(140);
   chassis.pid_turn_set(150_deg, TURN_SPEED);
   pros::delay(300);
-  chassis.pid_drive_set(31.5_in, DRIVE_SPEED);
+  chassis.pid_drive_set(30_in, DRIVE_SPEED);
   pros::delay(900);
   chassis.pid_turn_set(90_deg, TURN_SPEED);
   pros::delay(400);
